@@ -1,0 +1,7 @@
+[user]
+	name = Daniel Kloosterman
+	email = buz.i286@gmail.com
+[core]
+	excludesfile = /Users/buz/.gitignore
+[color]
+	ui = true
