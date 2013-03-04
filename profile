@@ -2,6 +2,9 @@
 # Put /usr/local/{sbin,bin} first
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
+source ~/.gitscripts/autocompletion.bash
+source ~/.gitscripts/prompt.bash
+
 fast_search()
 {
 	grep -n --color=auto $1 -r .
@@ -67,25 +70,30 @@ fi
 # /usr/share/big_dir_name -> ../share/big_dir_name if pwdmaxlen=20
 ##################################################
 bash_prompt_command() {
-	    # How many characters of the $PWD should be kept
-	    local pwdmaxlen=25
-	    # Indicate that there has been dir truncation
-	    local trunc_symbol=".."
-	    local dir=${PWD##*/}
-	    pwdmaxlen=$(( ( pwdmaxlen < ${#dir} ) ? ${#dir} : pwdmaxlen ))
-	    NEW_PWD=${PWD/$HOME/~}
-	    local pwdoffset=$(( ${#NEW_PWD} - pwdmaxlen ))
-	    if [ ${pwdoffset} -gt "0" ]
-	        then
-	        NEW_PWD=${NEW_PWD:$pwdoffset:$pwdmaxlen}
-	        NEW_PWD=${trunc_symbol}/${NEW_PWD#*/}
-	    fi
+  # How many characters of the $PWD should be kept
+  local pwdmaxlen=25
+
+  # Indicate that there has been dir truncation
+  local trunc_symbol=".."
+
+  # The current directory
+  local dir=${PWD##*/}
+  pwdmaxlen=$(( ( pwdmaxlen < ${#dir} ) ? ${#dir} : pwdmaxlen ))
+  NEW_PWD=${PWD/$HOME/~}
+
+  local pwdoffset=$(( ${#NEW_PWD} - pwdmaxlen ))
+  if [ ${pwdoffset} -gt "0" ]
+      then
+      NEW_PWD=${NEW_PWD:$pwdoffset:$pwdmaxlen}
+      NEW_PWD=${trunc_symbol}/${NEW_PWD#*/}
+  fi
+  BRANCH=`__git_ps1 " (%s)"`
 }
 #
 bash_prompt() {
-    local NONE='\[\033[0m\]'    # unsets color to term's fg color
+  local NONE='\[\033[0m\]'    # unsets color to term's fg color
 
-        # regular colors
+  # regular colors
 	local K='\[\033[0;30m\]'    # black
 	local R='\[\033[0;31m\]'    # red
 	local G='\[\033[0;32m\]'    # green
@@ -118,16 +126,9 @@ bash_prompt() {
 	local UC=$C                 # user's color
         [ $UID -eq "0" ] && UC=$R   # root's color
 
-    local BR=
-
-	#PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
-	#PS1="${EMK}[${UC}\u${EMR}@${UC}\h ${EMB}\${NEW_PWD}${EMK}]${UC}\\$ ${NONE}" 
-	PS1="${W}[\t${W}] ${Y}[${R}\u${R}@${R}\h ${EMB}\${NEW_PWD}${Y}]${W}\\$ ${NONE}"
-    #export PS1='\[\e[0:35m⌘\e[m \e[0:36m\w/\e[m \e[0:33m`git branch 2> /dev/null | grep -e ^* | sed -E s/^\\\\\*\ \(.+\)$/\(\\\\\1\)\ /`\e[m\]'
+	PS1="${W}[\t${W}] ${Y}[${R}\u${R}@${R}\h ${EMB}\${NEW_PWD}${G}\${BRANCH}${Y}]${W}\\$ ${NONE}"
 }
-#export CLICOLOR=1
-#export LSCOLORS=GxFxCxDxBxegedabagaced 
-#	
+
 PROMPT_COMMAND=bash_prompt_command
 bash_prompt
-unset bash_prompt:
+unset bash_prompt
